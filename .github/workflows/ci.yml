@@ -54,6 +54,7 @@ jobs:
           path: union/htmldocs
 
   deploy:
+    if: github.ref_name == 'main'
     name: Deploy docs to Github Pages
     needs: build
 
