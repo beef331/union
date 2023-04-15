@@ -8,7 +8,7 @@ jobs:
       matrix:
         branch: [devel]
 
-    name: 'Nim ${{ matrix.branch }}'
+    name: "Nim ${{ matrix.branch }}"
     runs-on: ubuntu-latest
 
     defaults:
@@ -49,11 +49,23 @@ jobs:
           # Ignore failures for older Nim
           cp htmldocs/{the,}index.html || true
 
-      - name: Publish docs
-        if: >
-          github.event_name == 'push' && github.ref == 'refs/heads/main'
-        uses: crazy-max/ghaction-github-pages@v3.1.0
+      - uses: actions/upload-pages-artifact@v1.0.8
         with:
-          build_dir: union/htmldocs
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          path: union/htmldocs
+
+  deploy:
+    name: Deploy docs to Github Pages
+    needs: build
+
+    permissions:
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    runs-on: ubuntu-latest
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v2.0.0
