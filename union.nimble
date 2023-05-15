@@ -1,6 +1,6 @@
 # Package
 
-version       = "0.1.3"
+version       = "0.1.4"
 author        = "Leorize"
 description   = "Anonymous unions in Nim"
 license       = "MIT"
