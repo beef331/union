@@ -335,8 +335,9 @@ template union*(T: untyped): untyped =
   ## The typeclass may contain other typeclasses, or other unions.
   ##
   ## If the typeclass contain one unique type, then that unique type will be returned.
-  type TImpl {.gensym.} = T
-  unionize(TImpl, T)
+  block:
+    type TImpl = T
+    unionize(TImpl, T)
 
 proc unionize(T, info: NimNode): NimNode =
   ## The actual union type builder
