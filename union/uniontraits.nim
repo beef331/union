@@ -13,10 +13,11 @@ import std/options
 import typeutils
 
 type
-  Union*[T] {.pure.} = object of RootObj
+  Union*[T] {.pure, inheritable.} = object
     ## Base type of which all unions inherit from.
     ##
     ## It has no properties other than being a typeclass for matching unions.
+    empty: byte ## Empty field, used to appease codegen
 
   UnionTy* = distinct NimNode
     ## A distinct NimNode representing the type of an Union object.
