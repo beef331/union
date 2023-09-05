@@ -24,6 +24,9 @@ type
     ## Internally all Unions are a case object, dispatched via a compile-time
     ## generated enum.
 
+  UnionInst = Union[void]
+    ## The instance of `Union` used as parent for union types.
+
 converter toNimNode(u: UnionTy): NimNode = NimNode(u)
   ## Allow us to manipulate UnionTy in here.
   ##
@@ -63,13 +66,10 @@ func newUnionType*(enumType: NimNode): UnionTy =
   result = UnionTy:
     nnkObjectTy.newTree(
       newEmptyNode(), # The generics portion, we don't have it
-      # Inherit from `Union[void]` to allow unions to be matched by a
+      # Inherit from an instance of `Union` to allow unions to be matched by a
       # T: Union constraint
       nnkOfInherit.newTree(
-        nnkBracketExpr.newTree(
-          bindSym"Union",
-          bindSym"void"
-        )
+        bindSym"UnionInst"
       ),
       # The list of fields
       nnkRecList.newTree(
@@ -87,8 +87,11 @@ proc getUnionType*(n: NimNode): UnionTy =
   ## Returns `nil` if `n` is not an union.
   let typ = getTypeSkip(n)
   if typ.kind == nnkObjectTy:
-    # Verify that `n` inherits from Union.
-    if typ.inherits.sameType(bindSym"Union"):
+    # Verify that `n` inherits from UnionInst.
+    if typ.inherits.sameType(bindSym"UnionInst"):
+      UnionTy(typ)
+    # For Nim before PR 22642
+    elif typ.inherits.sameType(bindSym"Union"):
       UnionTy(typ)
     else:
       UnionTy(nil)
